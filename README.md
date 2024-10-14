@@ -39,6 +39,7 @@ This tool is built to manage job applications, interact with OpenAI's GPT-based 
    ```bash
    git clone https://github.com/your-username/Application-Kannon-47.git
    cd Application-Kannon-47
+   ```
 
 2. **Set Up a Virtual Environment:**
    It's a good practice to use a virtual environment to manage your dependencies.
@@ -46,11 +47,13 @@ This tool is built to manage job applications, interact with OpenAI's GPT-based 
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
 
 3. **Install Dependencies:**
    Install the required Python packages using the following command:
    ```bash
    pip install -r requirements.txt
+   ```
 
 4. **Set Up the Database:**
    Create and initialize your SQLite database. Ensure your database schema is correctly set up before running the application. You may need to create the necessary tables as described in the code comments.
@@ -64,11 +67,13 @@ This tool is built to manage job applications, interact with OpenAI's GPT-based 
    DB_HOST=localhost
    DB_PORT=5432
    OPENAI_API_KEY=your_openai_api_key
+   ```
 
 6. **Run the Application:**
    You can start the application by running:
    ```bash
    python main.py
+   ```
 
 ## Usage
 
