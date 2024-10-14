@@ -1,6 +1,5 @@
-# api_key_file
-
-api_key.txt
+# databases
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
