@@ -1,26 +1,10 @@
+from langchain_ollama import OllamaLLM                  # allows me to load models from ollama-server (local)
+from langchain_core.prompts import ChatPromptTemplate   # allows me to import template prompts
 import os
 import sqlite3  # Use sqlite3 instead of psycopg2
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 from dotenv import load_dotenv
-from langchain_ollama import OllamaLLM
-from langchain_core.prompts import ChatPromptTemplate
-
-# Define template and model for Llama
-template = '''
-Answer the Question below.
-
-Here is the context: {context}
-
-Question: {question}
-
-Answer: 
-'''
-
-# Initialize the Llama model and prompt
-model = OllamaLLM(model="llama3.1")  # Llama model you're using
-prompt = ChatPromptTemplate.from_template(template)
-chain = prompt | model
 
 def center_window(window, width, height):
     """Centers the window on the screen."""
@@ -32,7 +16,7 @@ def center_window(window, width, height):
 
     window.geometry(f'{width}x{height}+{x}+{y}')
 
-def help_llama(user_id):
+def help_chatgpt(user_id):
     load_dotenv()
 
     # SQLite connection setup
@@ -40,7 +24,7 @@ def help_llama(user_id):
     cursor = conn.cursor()
 
     help_chat = tk.Tk()
-    help_chat.title("Llama Assistant")
+    help_chat.title("mempal Assistant")
 
     window_width = 1024
     window_height = 768
@@ -56,20 +40,43 @@ def help_llama(user_id):
         from chat_log import open_log
         open_log(user_id)  # Pass the user_id to the chat_log module
 
+    # defining the templatge for the ollama-model
+
+    
+
     chat_log = ScrolledText(help_chat, wrap=tk.WORD, state=tk.DISABLED, bg="white", fg="black", font=("Arial", 12))
     chat_log.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
     user_entry = tk.Entry(help_chat, font=("Arial", 12))
     user_entry.pack(padx=10, pady=10, fill=tk.X)
 
-    def get_llama_response(messages):
-        # Construct the context and question from messages
-        context = "\n".join([f"{msg['role'].capitalize()}: {msg['content']}" for msg in messages])
-        question = messages[-1]['content']  # Get the last user input
+    template = '''  
+    You are here to help the user find a job. Answer the Question below. 
 
-        # Use the Llama chain for generating a response
-        result = chain.invoke({'context': context, 'question': question})
-        return result
+    Here is the conversation history: {context}
+
+    Question: {question}
+
+    Answer: 
+    '''
+
+    model = OllamaLLM(model="llama3.1") # loading the model
+    prompt = ChatPromptTemplate.from_template(template) # creating prompt from template (context and question)
+    chain = prompt | model  # creating a chain that passes the prompt to the model.
+
+
+    # keeping the name for the time being
+
+    def get_chatgpt_response(): # passing the template to the chat function
+        context = ''
+        while True:
+            user_input = input('You: ')
+
+            result = chain.invoke({'context': context, 'question': user_input}) # assigning the chain to result
+
+            return result # returning the result
+        except Exception as e:
+            return f"Error: {str(e)}"
 
     def insert_into_db(user_input, response):
         try:
@@ -90,9 +97,9 @@ def help_llama(user_id):
             chat_log.config(state=tk.DISABLED)
             messages.append({"role": "user", "content": user_input})
 
-            response = get_llama_response(messages)
+            response = get_chatgpt_response(messages)
             chat_log.config(state=tk.NORMAL)
-            chat_log.insert(tk.END, f"Llama: {response}\n\n")
+            chat_log.insert(tk.END, f"CHAT GPT: {response}\n\n")
             chat_log.config(state=tk.DISABLED)
 
             # Save the conversation into the database with the user_id
