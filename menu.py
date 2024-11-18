@@ -30,8 +30,8 @@ def open_offers(user_id):
 def chat_gpt(user_id):
     """Opens the Chat."""
     root.destroy()
-    from ai_module.chatgpt import help_chatgpt
-    help_chatgpt(user_id)
+    from ai_module.llama3_1 import help_mempal
+    help_mempal(user_id)
 
 def open_search(user_id):
     """Opens the Search window."""
