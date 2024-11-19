@@ -17,7 +17,7 @@ Question: {question}
 
 Answer:
 '''
-model = OllamaLLM(model="llama3.1")
+model = OllamaLLM(model="gemma2:27b")
 prompt = ChatPromptTemplate.from_template(template)
 chain = prompt | model
 

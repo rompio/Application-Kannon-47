@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 import sqlite3  # Using sqlite3 for SQLite database
-from ai_module.letter_generator import generate_application_letter
+from ai_module.letter_generator_ollama import generate_application_letter
 import letter
 
 # SQLite database file path
