@@ -1,6 +1,6 @@
 import openai
 import os
-import sqlite3  # Use sqlite3 instead of psycopg2
+import sqlite3
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 from dotenv import load_dotenv
@@ -27,7 +27,6 @@ def help_chatgpt(user_id):
 
     window_width = 1024
     window_height = 768
-    
     center_window(help_chat, window_width, window_height)
 
     def on_back():
@@ -60,7 +59,7 @@ def help_chatgpt(user_id):
         except Exception as e:
             return f"Error: {str(e)}"
 
-    def insert_into_db(user_input, response):
+    def insert_into_db(user_input, response, user_id):
         try:
             # Insert user input, assistant response, and user_id into the database
             cursor.execute(
@@ -71,23 +70,82 @@ def help_chatgpt(user_id):
         except Exception as e:
             print(f"Database Error: {str(e)}")
 
+    def store_reminder(reminder, user_id):
+        try:
+            # Insert the reminder into the reminders table (or update the user's info in p_info)
+            cursor.execute(
+                "INSERT INTO chat_log (user_input, assistant_response, user_id) VALUES (?, ?, ?)",  # Store the reminder
+                (f"MIND: {reminder}", f"I will remember this: {reminder}", user_id)
+            )
+            conn.commit()
+        except Exception as e:
+            print(f"Database Error while storing reminder: {str(e)}")
+
     def send_message(event=None):
         user_input = user_entry.get().strip()
+        
         if user_input:
+            # Check if the user input starts with the codeword 'MIND'
+            if user_input.startswith("MIND"):
+                reminder = user_input[len("MIND"):].strip()  # Get the reminder after 'MIND'
+                store_reminder(reminder, user_id)  # Store the reminder in the database
+                response = f"I will remember this: {reminder}"  # Acknowledge the reminder
+                chat_log.config(state=tk.NORMAL)
+                chat_log.insert(tk.END, f"YOU: {user_input}\nCHAT GPT: {response}\n\n")
+                chat_log.config(state=tk.DISABLED)
+                return
+
+            # Fetch the user's personal information from p_info
+            cur = conn.cursor()
+            cur.execute("SELECT first_name, last_name, email, background FROM p_info WHERE user_id=?", (user_id,))
+            user_info = cur.fetchone()
+            
+            # Build user profile string if user_info exists
+            if user_info:
+                first_name, last_name, email, background = user_info
+                user_profile = f"User: {first_name} {last_name}, Email: {email}, Background: {background}"
+            else:
+                user_profile = "User information is unavailable."
+            
+            # Fetch the conversation history for the user from chat_log, but limit it to the last N messages
+            cur.execute("SELECT user_input, assistant_response FROM chat_log WHERE user_id=? ORDER BY created_at DESC LIMIT 5", (user_id,))
+            chat_history = cur.fetchall()
+            
+            # Build chat history string, limiting it to the most recent 5 messages
+            chat_history_str = "\n".join([f"YOU: {chat[0]}\nCHAT GPT: {chat[1]}" for chat in chat_history])
+            
+            # Construct the system message with user profile and chat history
+            system_message = f"""
+                You are a helpful assistant. Always remember the user's details:
+                {user_profile}
+                Previous conversations:
+                {chat_history_str}
+            """
+            
+            # Append system message and user input to the messages list
+            messages.append({"role": "system", "content": system_message})
+            messages.append({"role": "user", "content": user_input})
+            
+            # Display the user input in the chat log
             chat_log.config(state=tk.NORMAL)
             chat_log.insert(tk.END, f"YOU: {user_input}\n")
             chat_log.config(state=tk.DISABLED)
-            messages.append({"role": "user", "content": user_input})
-
+            
+            # Get the response from ChatGPT
             response = get_chatgpt_response(messages)
+            
+            # Display the assistant's response
             chat_log.config(state=tk.NORMAL)
             chat_log.insert(tk.END, f"CHAT GPT: {response}\n\n")
             chat_log.config(state=tk.DISABLED)
-
-            # Save the conversation into the database with the user_id
-            insert_into_db(user_input, response)
-
+            
+            # Save the conversation into the database
+            insert_into_db(user_input, response, user_id)
+            
+            # Append assistant response to messages
             messages.append({"role": "assistant", "content": response})
+            
+            # Clear the user input field
             user_entry.delete(0, tk.END)
 
     user_entry.bind("<Return>", send_message)
