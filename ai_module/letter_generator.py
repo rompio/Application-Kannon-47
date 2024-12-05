@@ -23,7 +23,7 @@ def generate_application_letter(name, p_info, position, comp_name, comp_desc, of
             max_tokens=1000,
         )
             # Append the user's message to the conversation history
-        messages.append({"role": "user", "content": f"Generate an application letter on behalf of: '{name}' - '{p_info}' to apply for the position {position} at the following company: '{comp_name}'. This is a description of the company: '{comp_desc}'. And this is the actual job offer text: {offer}. Write an application letter to the company. Focus on where skillz and strength of the applicant match the requirements of the position and be creative here. Use the language of the offer for the application letter."})
+        messages.append({"role": "user", "content": f"Generate an application letter on behalf of: '{name}' - '{p_info}' to apply for the position {position} at the following company: '{comp_name}'. This is a description of the company: '{comp_desc}'. And this is the actual job offer text: {offer}. Write an application letter to the company. Focus on where skillz and strength of the applicant match the requirements of the position and be creative here. NOTE!!!: USE LANGUAGE THAT IS USED IN THE JOB OFFER(!!!) for the application letter."})
 
 
         letter = response.choices[0].message.content
