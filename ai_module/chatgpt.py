@@ -50,7 +50,7 @@ def help_chatgpt(user_id):
     def get_chatgpt_response(messages):
         try:
             response = openai.chat.completions.create(
-                model="gpt-4",
+                model="gpt-3.5-turbo",
                 messages=messages,
                 temperature=1.0,
                 max_tokens=1000,
