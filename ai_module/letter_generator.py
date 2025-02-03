@@ -11,10 +11,16 @@ def generate_application_letter(name, p_info, position, comp_name, comp_desc, of
 
         # Conversation history and the initial system message
         system_role = f"You are here to help the user to find a job"  # Define system role here
-        messages = [{"role": "system", "content": system_role}, {"role": "user", "content": f"Generate an application letter on behalf of: '{name}' - '{p_info}' to apply for the position {position} at the following company: '{comp_name}'. This is a description of the company: '{comp_desc}'. And this is the actual job offer text: {offer}. Write an application letter to the company. Focus on where skillz and strength of the applicant match the requirements of the position and be creative here. Use the language of the offer for the application letter."}]
-
-        # Load the OpenAI API key from a file
-        api_key = os.getenv('OPENAI_API_KEY')
+        messages = [
+            {"role": "system",
+             "content": system_role},
+               {"role": "user",
+                "content": f"""
+                Erstelle ein Anschreiben im Namen von: '{name}' - '{p_info}' als Bewerbung auf die
+                 Stelle als {position} Bei folgendem Arbeitgeber: '{comp_name} - {comp_desc}'. 
+                 Dies ist das Stellenangebot: {offer}. Halte dich bei der Erstellung des Anschreibens
+                 an die Sprache, in der die Ausschreibung und die Arbeitgeberbeschreibung verfasst wurde.
+                 """}]
 
         response = openai.chat.completions.create(
             model="gpt-4",
@@ -22,10 +28,7 @@ def generate_application_letter(name, p_info, position, comp_name, comp_desc, of
             temperature=1.0,
             max_tokens=1000,
         )
-            # Append the user's message to the conversation history
-        messages.append({"role": "user", "content": f"Generate an application letter on behalf of: '{name}' - '{p_info}' to apply for the position {position} at the following company: '{comp_name}'. This is a description of the company: '{comp_desc}'. And this is the actual job offer text: {offer}. Write an application letter to the company. Focus on where skillz and strength of the applicant match the requirements of the position and be creative here. NOTE!!!: USE LANGUAGE THAT IS USED IN THE JOB OFFER(!!!) for the application letter."})
-
-
+    
         letter = response.choices[0].message.content
         return letter
     except Exception as e:
