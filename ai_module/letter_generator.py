@@ -19,7 +19,8 @@ def generate_application_letter(name, p_info, position, comp_name, comp_desc, of
                 Erstelle ein Anschreiben im Namen von: '{name}' - '{p_info}' als Bewerbung auf die
                  Stelle als {position} Bei folgendem Arbeitgeber: '{comp_name} - {comp_desc}'. 
                  Dies ist das Stellenangebot: {offer}. Halte dich bei der Erstellung des Anschreibens
-                 an die Sprache, in der die Ausschreibung und die Arbeitgeberbeschreibung verfasst wurde.
+                 an die SPRACHE, IN DER DIE AUSSCHREIBUNG UND DIE ARBEITGEBERBESCHREIBUNG VERFASST WURDE (WICHTIG!!!!).
+                 ALSO WENN DIE FIRMA ENGLISCH SCHREIBT, SCHREIBST DU ACUH IN ENGLISH!!! Denk daran!
                  """}]
 
         response = openai.chat.completions.create(
