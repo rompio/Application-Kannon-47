@@ -1,5 +1,4 @@
 from langchain.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
 from langchain_ollama import OllamaLLM
 
 # Function to generate application letter using Ollama model
@@ -20,13 +19,13 @@ def generate_application_letter(name, p_info, position, comp_name, comp_desc, of
         prompt = ChatPromptTemplate.from_template(template)
 
         # Initialize the Ollama model
-        model = OllamaLLM(model="gemma2:27b")
+        model = OllamaLLM(model="phi4")
 
-        # Create a chain with the prompt and the model
-        chain = LLMChain(prompt=prompt, llm=model)
+        # Use the new RunnableSequence (prompt | llm)
+        chain = prompt | model
 
         # Run the chain with the provided values and generate the response
-        response = chain.run({
+        response = chain.invoke({
             'name': name,
             'p_info': p_info,
             'position': position,

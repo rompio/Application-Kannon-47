@@ -17,7 +17,7 @@ Question: {question}
 
 Answer:
 '''
-model = OllamaLLM(model="gemma2:27b")
+model = OllamaLLM(model="phi4")
 prompt = ChatPromptTemplate.from_template(template)
 chain = prompt | model
 
@@ -30,9 +30,9 @@ def center_window(window, width, height):
     window.geometry(f'{width}x{height}+{x}+{y}')
 
 def fetch_user_info(user_id, cursor):
-    """Fetch user-specific information from p_info, offers, and applications tables."""
+    """Fetch user-specific information from p_info table only."""
     try:
-        # Fetch personal info
+        # Fetch personal info (we won't fetch offers and applications)
         cursor.execute(
             "SELECT first_name, last_name, email, background FROM p_info WHERE user_id = ?",
             (user_id,)
@@ -43,36 +43,8 @@ def fetch_user_info(user_id, cursor):
             personal_info_str = f"User's Name: {first_name} {last_name}\nEmail: {email}\nBackground: {background if background else 'N/A'}"
         else:
             personal_info_str = "Personal Info: Not available."
-
-        # Fetch offers
-        cursor.execute(
-            "SELECT position, company, offer, about, url, status, response FROM offers WHERE user_id = ?",
-            (user_id,)
-        )
-        offers = cursor.fetchall()
-        if offers:
-            offers_str = "Job Offers:\n" + "\n".join(
-                f"- Position: {row[0]} at {row[1]}\n  Offer: {row[2]}\n  About: {row[3]}\n  URL: {row[4]}\n  Status: {'Accepted' if row[5] == 1 else 'Pending'}\n  Response: {'Yes' if row[6] else 'No'}"
-                for row in offers
-            )
-        else:
-            offers_str = "Job Offers: No offers available."
-
-        # Fetch applications
-        cursor.execute(
-            "SELECT resume, offer_id FROM applications WHERE user_id = ?",
-            (user_id,)
-        )
-        applications = cursor.fetchall()
-        if applications:
-            applications_str = "Applications:\n" + "\n".join(
-                f"- Resume: {row[0]}\n  Offer ID: {row[1]}"
-                for row in applications
-            )
-        else:
-            applications_str = "Applications: No applications available."
-
-        return f"{personal_info_str}\n\n{offers_str}\n\n{applications_str}"
+        
+        return personal_info_str
 
     except Exception as e:
         print(f"Database Error: {str(e)}")
@@ -132,6 +104,7 @@ def help_mempal(user_id):
     user_entry.pack(padx=10, pady=10, fill=tk.X)
 
     def get_mempal_response(user_input):
+        # Only include chat log and personal info in the context
         context = fetch_chat_log(user_id, cursor) + "\n\n" + fetch_user_info(user_id, cursor)
         result = chain.invoke({'context': context, 'question': user_input})
         return result
