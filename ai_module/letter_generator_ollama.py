@@ -19,27 +19,24 @@ def generate_application_letter(name, p_info, position, comp_name, comp_desc, of
         # Create a ChatPromptTemplate with the provided template
         prompt = ChatPromptTemplate.from_template(template)
 
-        # Fill in the template with the provided values
-        filled_prompt = prompt.format_prompt(
-            name=name,
-            p_info=p_info,
-            position=position,
-            comp_name=comp_name,
-            comp_desc=comp_desc,
-            offer=offer,
-        )
-
         # Initialize the Ollama model
         model = OllamaLLM(model="gemma2:27b")
 
-        # Create a simple chain with the prompt and the model
-        chain = filled_prompt | model
+        # Create a chain with the prompt and the model
+        chain = LLMChain(prompt=prompt, llm=model)
 
-        # Generate the application letter
-        response = chain.run()
+        # Run the chain with the provided values and generate the response
+        response = chain.run({
+            'name': name,
+            'p_info': p_info,
+            'position': position,
+            'comp_name': comp_name,
+            'comp_desc': comp_desc,
+            'offer': offer,
+        })
 
         # Return the generated letter
         return response
     except Exception as e:
-        print("Ollama Model Error", f"Failed to generate application letter.\nError: {e}")
+        print(f"Ollama Model Error: Failed to generate application letter.\nError: {e}")
         return None
