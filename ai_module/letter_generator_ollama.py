@@ -12,7 +12,7 @@ def generate_application_letter(name, p_info, position, comp_name, comp_desc, of
             "And this is the actual job offer text: {offer}. "
             "Write an application letter to the company. "
             "Focus on where skills and strengths of the applicant match the requirements "
-            "of the position and be creative here. Use the language of the offer for the application letter."
+            "of the position and be creative here. Use the LANGUAGE THE OFFER IDS WRITTEN IN for the application letter."
         )
 
         # Create a ChatPromptTemplate with the provided template
